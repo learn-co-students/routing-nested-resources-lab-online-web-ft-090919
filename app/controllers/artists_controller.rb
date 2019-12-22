@@ -1,52 +1,69 @@
-class ArtistsController < ApplicationController
+class SongsController < ApplicationController
   def index
-    @artists = Artist.all
+    if params[:artist_id]
+      @artist = Artist.find_by(id: params[:artist_id])
+      if @artist.nil?
+        redirect_to artists_path, alert: "Artist not found"
+      else
+        @songs = @artist.songs
+      end
+    else
+      @songs = Song.all
+    end
   end
 
   def show
-    @artist = Artist.find(params[:id])
+    if params[:artist_id]
+      @artist = Artist.find_by(id: params[:artist_id])
+      @song = @artist.songs.find_by(id: params[:id])
+      if @song.nil?
+        redirect_to artist_songs_path(@artist), alert: "Song not found"
+      end
+    else
+      @song = Song.find(params[:id])
+    end
   end
 
   def new
-    @artist = Artist.new
+    @song = Song.new
   end
 
   def create
-    @artist = Artist.new(artist_params)
+    @song = Song.new(song_params)
 
-    if @artist.save
-      redirect_to @artist
+    if @song.save
+      redirect_to @song
     else
       render :new
     end
   end
 
   def edit
-    @artist = Artist.find(params[:id])
+    @song = Song.find(params[:id])
   end
 
   def update
-    @artist = Artist.find(params[:id])
+    @song = Song.find(params[:id])
 
-    @artist.update(artist_params)
+    @song.update(song_params)
 
-    if @artist.save
-      redirect_to @artist
+    if @song.save
+      redirect_to @song
     else
       render :edit
     end
   end
 
   def destroy
-    @artist = Artist.find(params[:id])
-    @artist.destroy
-    flash[:notice] = "Artist deleted."
-    redirect_to artists_path
+    @song = Song.find(params[:id])
+    @song.destroy
+    flash[:notice] = "Song deleted."
+    redirect_to songs_path
   end
 
   private
 
-  def artist_params
-    params.require(:artist).permit(:name)
+  def song_params
+    params.require(:song).permit(:title, :artist_name)
   end
 end
