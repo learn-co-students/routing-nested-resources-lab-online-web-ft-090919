@@ -1,17 +1,17 @@
 class SongsController < ApplicationController
   def index
     if params[:artist_id]
-      @artist = Artist.find_by(id: params[:artist_id])
-      if @artist.nil?
+      artist = Artist.find_by(id: params[:artist_id])
+      if artist.nil?
         flash[:alert] = "Artist not found."
         redirect_to artists_path
       else
-        @songs = @artist.songs
+        @songs = artist.songs
       end
     else
-    @songs = Song.all
+      @songs = Song.all
+    end
   end
-end
 
   def show
     if params[:artist_id]
@@ -26,9 +26,9 @@ end
         end
       end
     else
-    @song = Song.find_by(params[:id])
+      @song = Song.find_by(id: params[:id])
+    end
   end
-end
 
   def new
     @song = Song.new
@@ -71,7 +71,5 @@ end
 
   def song_params
     params.require(:song).permit(:title, :artist_name)
-
   end
 end
-
